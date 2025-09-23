@@ -9,10 +9,10 @@ function SimpleEditableText({
   className = "",
   multiline = false,
   placeholder = "Escribe aquí...",
-  isSelected = false,
-  onSelect,
   elementId,
-  currentStyles = {}
+  isSelected,
+  onSelect,
+  currentStyles
 }) {
   const [value, setValue] = useState(text);
   const [isEditingLocal, setIsEditingLocal] = useState(false);
@@ -65,7 +65,7 @@ function SimpleEditableText({
     const finalValue = value.trim() === "" ? originalValue : value;
     
     if (onSave && finalValue !== originalValue) {
-      onSave(finalValue);
+      onSave(finalValue, elementId);
       setOriginalValue(finalValue);
     }
   };
@@ -88,6 +88,7 @@ function SimpleEditableText({
     switch (currentStyles.fontSize) {
       case 'small': styleClasses += 'text-sm '; break;
       case 'large': styleClasses += 'text-lg '; break;
+      case 'xlarge': styleClasses += 'text-xl '; break;
       default: styleClasses += 'text-base ';
     }
 
@@ -103,7 +104,7 @@ function SimpleEditableText({
   if (isEditing && isEditingLocal) {
     if (multiline) {
       return (
-        <div className={`relative editable-element editing ${isSelected ? 'element-selected' : ''}`}>
+        <div className={`editable-element editing ${isSelected ? 'selected' : ''}`}>
           <textarea
             ref={inputRef}
             value={value}
@@ -118,14 +119,13 @@ function SimpleEditableText({
               height: 'auto',
               color: currentStyles?.color || 'inherit'
             }}
-            onClick={(e) => e.stopPropagation()}
           />
-          {isSelected && <div className="selection-indicator"></div>}
+          {isSelected && <div className="selected-indicator">✓</div>}
         </div>
       );
     } else {
       return (
-        <div className={`relative editable-element editing ${isSelected ? 'element-selected' : ''}`}>
+        <div className={`editable-element editing ${isSelected ? 'selected' : ''}`}>
           <input
             type="text"
             value={value}
@@ -137,9 +137,8 @@ function SimpleEditableText({
             style={{
               color: currentStyles?.color || 'inherit'
             }}
-            onClick={(e) => e.stopPropagation()}
           />
-          {isSelected && <div className="selection-indicator"></div>}
+          {isSelected && <div className="selected-indicator">✓</div>}
         </div>
       );
     }
@@ -150,23 +149,26 @@ function SimpleEditableText({
       <div
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        className={`${className} ${applyStyles()} editable-element ${isSelected ? 'element-selected selected' : ''} break-words whitespace-normal overflow-hidden text-contain rounded-lg p-2 min-h-[44px] flex items-center smooth-transition ${
-          value === placeholder ? 'text-gray-400 italic' : ''
-        }`}
+        className={`${className} ${applyStyles()} editable-element edit-ready break-words whitespace-normal overflow-hidden text-contain rounded-lg p-2 min-h-[44px] flex items-center smooth-transition ${
+          isSelected ? 'selected' : ''
+        } ${value === placeholder ? 'text-gray-400 italic' : ''}`}
         style={{
           color: currentStyles?.color || 'inherit'
         }}
       >
         {value || placeholder}
-        {isSelected && <div className="selection-indicator"></div>}
+        {isSelected && <div className="selected-indicator">✎</div>}
       </div>
     );
   }
 
   return (
-    <div className={`${className} break-words whitespace-normal overflow-hidden text-contain ${
+    <div className={`${className} ${applyStyles()} break-words whitespace-normal overflow-hidden text-contain ${
       value === placeholder ? 'text-gray-400 italic' : ''
-    }`}>
+    }`}
+    style={{
+      color: currentStyles?.color || 'inherit'
+    }}>
       {value || text}
     </div>
   );
@@ -181,31 +183,22 @@ export default function EditableCard({
   isEditing, 
   onSave,
   cardId,
-  isSelected = false,
+  isSelected,
   onSelect,
-  currentStyles = {}
+  currentStyles
 }) {
-  const [selectedElement, setSelectedElement] = useState(null);
-
-  const handleTitleSave = (newTitle) => {
-    if (onSave) onSave({ type: 'title', value: newTitle, cardId, elementId: 'title' });
+  const handleTitleSave = (newTitle, elementId) => {
+    if (onSave) onSave({ type: 'title', value: newTitle, elementId, cardId });
   };
 
-  const handleDescriptionSave = (newDescription) => {
-    if (onSave) onSave({ type: 'description', value: newDescription, cardId, elementId: 'description' });
-  };
-
-  const handleElementSelect = (elementId) => {
-    setSelectedElement(elementId);
-    if (onSelect) {
-      onSelect(cardId, elementId);
-    }
+  const handleDescriptionSave = (newDescription, elementId) => {
+    if (onSave) onSave({ type: 'description', value: newDescription, elementId, cardId });
   };
 
   const handleCardClick = (e) => {
     e.stopPropagation();
     if (isEditing && onSelect) {
-      onSelect(cardId, 'card');
+      onSelect(cardId);
     }
   };
 
@@ -213,19 +206,17 @@ export default function EditableCard({
     <div 
       onClick={handleCardClick}
       className={`p-4 rounded-lg border-2 ${borderColor} ${bgColor} shadow-sm hover:shadow-md transition-all duration-300 min-h-[160px] flex flex-col overflow-hidden w-full smooth-transition ${
-        isEditing ? 'card-editable edit-mode' : ''
-      } ${isSelected ? 'element-selected' : ''}`}
+        isSelected ? 'selected editable-element edit-ready' : ''
+      }`}
     >
-      {isSelected && <div className="selection-indicator"></div>}
-      
       <div className="mb-3 min-h-[52px] flex items-start overflow-hidden">
         <SimpleEditableText
           text={title}
           isEditing={isEditing}
           onSave={handleTitleSave}
-          isSelected={isSelected && selectedElement === 'title'}
-          onSelect={handleElementSelect}
-          elementId="title"
+          elementId={`${cardId}-title`}
+          isSelected={isSelected}
+          onSelect={onSelect}
           currentStyles={currentStyles}
           className="text-lg font-semibold text-gray-800 w-full line-clamp-2"
           multiline={false}
@@ -238,9 +229,9 @@ export default function EditableCard({
           text={description}
           isEditing={isEditing}
           onSave={handleDescriptionSave}
-          isSelected={isSelected && selectedElement === 'description'}
-          onSelect={handleElementSelect}
-          elementId="description"
+          elementId={`${cardId}-description`}
+          isSelected={isSelected}
+          onSelect={onSelect}
           currentStyles={currentStyles}
           className="text-sm text-gray-600 w-full line-clamp-3"
           multiline={true}
@@ -255,6 +246,7 @@ export default function EditableCard({
           </span>
         </div>
       )}
+      {isSelected && <div className="selected-indicator">✦</div>}
     </div>
   );
 
