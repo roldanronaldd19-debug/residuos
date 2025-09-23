@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-export default function EditPanel({ isOpen, onStyleChange, selectedElement }) {
+export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElement }) {
   const [activeStyles, setActiveStyles] = useState({
     bold: false,
     italic: false,
@@ -12,29 +12,30 @@ export default function EditPanel({ isOpen, onStyleChange, selectedElement }) {
   });
 
   const colors = [
-    '#000000', '#374151', '#6b7280', '#ef4444', '#f59e0b',
-    '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff',
-    '#dc2626', '#ea580c', '#84cc16', '#06b6d4', '#8b5cf6'
+    '#000000', '#374151', '#6b7280', '#ef4444', '#f59e0b', '#10b981',
+    '#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#84cc16', '#ffffff'
   ];
 
   const fontSizes = [
-    { label: 'S', value: 'small', class: 'text-sm' },
-    { label: 'M', value: 'medium', class: 'text-base' },
-    { label: 'L', value: 'large', class: 'text-lg' },
-    { label: 'XL', value: 'xlarge', class: 'text-xl' }
+    { label: 'Peq', value: 'small' },
+    { label: 'Med', value: 'medium' },
+    { label: 'Gr', value: 'large' },
+    { label: 'XG', value: 'xlarge' }
   ];
 
   const alignments = [
     { label: 'Izq', value: 'left', icon: '⫷' },
-    { label: 'Centro', value: 'center', icon: '⫸' },
+    { label: 'Cen', value: 'center', icon: '⫸' },
     { label: 'Der', value: 'right', icon: '⫹' }
   ];
 
   useEffect(() => {
-    if (selectedElement && selectedElement.styles) {
-      setActiveStyles(selectedElement.styles);
+    if (isOpen) {
+      document.body.classList.add('editing-mode');
+    } else {
+      document.body.classList.remove('editing-mode');
     }
-  }, [selectedElement]);
+  }, [isOpen]);
 
   const handleStyleToggle = (style, value) => {
     const newStyles = {
@@ -80,56 +81,86 @@ export default function EditPanel({ isOpen, onStyleChange, selectedElement }) {
     return styleString;
   };
 
-  if (!isOpen) return null;
+  const resetStyles = () => {
+    const defaultStyles = {
+      bold: false,
+      italic: false,
+      underline: false,
+      color: '#000000',
+      fontSize: 'medium',
+      align: 'left'
+    };
+    setActiveStyles(defaultStyles);
+    onStyleChange(defaultStyles);
+  };
 
   return (
-    <div className="edit-panel-compact">
-      <div className="panel-header">
-        <h2 className="text-lg font-semibold">Editor</h2>
-        <p className="text-blue-100 text-sm mt-1">
-          {selectedElement ? `Editando: ${selectedElement.type}` : 'Selecciona un texto'}
-        </p>
+    <div className={`edit-panel-sidebar ${isOpen ? 'open' : ''}`}>
+      <div className="edit-panel-header">
+        <div>
+          <h2 className="text-sm font-semibold">Editor</h2>
+          <p className="text-xs opacity-90">Selecciona y edita elementos</p>
+        </div>
+        <button 
+          onClick={onClose}
+          className="text-white hover:text-gray-200 text-lg"
+          title="Cerrar editor"
+        >
+          ✕
+        </button>
       </div>
 
-      <div className="panel-content">
+      <div className="edit-panel-content">
+        {/* Elemento seleccionado */}
+        <div className="edit-panel-section">
+          <h3>Elemento Seleccionado</h3>
+          <div className="p-3 bg-gray-50 rounded-lg text-xs">
+            {selectedElement ? (
+              <div>
+                <div className="font-medium">{selectedElement.type}</div>
+                <div className="text-gray-600 truncate">{selectedElement.text}</div>
+              </div>
+            ) : (
+              <div className="text-gray-500">Haz clic en un elemento para editarlo</div>
+            )}
+          </div>
+        </div>
+
         {/* Estilos de texto */}
-        <div className="control-group">
+        <div className="edit-panel-section">
           <h3>Estilos</h3>
-          <div className="control-grid">
-            <button
-              className={`control-button ${activeStyles.bold ? 'active' : ''}`}
-              onClick={() => handleStyleToggle('bold', !activeStyles.bold)}
-            >
-              <span className="font-bold">B</span>
-              <span>Negrita</span>
-            </button>
-            
-            <button
-              className={`control-button ${activeStyles.italic ? 'active' : ''}`}
-              onClick={() => handleStyleToggle('italic', !activeStyles.italic)}
-            >
-              <span className="italic">I</span>
-              <span>Cursiva</span>
-            </button>
-            
-            <button
-              className={`control-button ${activeStyles.underline ? 'active' : ''}`}
-              onClick={() => handleStyleToggle('underline', !activeStyles.underline)}
-            >
-              <span className="underline">U</span>
-              <span>Subrayado</span>
-            </button>
+          <div className="compact-controls">
+            <div className="flex gap-2">
+              <button
+                className={`compact-button flex-1 ${activeStyles.bold ? 'active' : ''}`}
+                onClick={() => handleStyleToggle('bold', !activeStyles.bold)}
+              >
+                <span className="font-bold">B</span>
+              </button>
+              <button
+                className={`compact-button flex-1 ${activeStyles.italic ? 'active' : ''}`}
+                onClick={() => handleStyleToggle('italic', !activeStyles.italic)}
+              >
+                <span className="italic">I</span>
+              </button>
+              <button
+                className={`compact-button flex-1 ${activeStyles.underline ? 'active' : ''}`}
+                onClick={() => handleStyleToggle('underline', !activeStyles.underline)}
+              >
+                <span className="underline">U</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Tamaño de fuente */}
-        <div className="control-group">
+        <div className="edit-panel-section">
           <h3>Tamaño</h3>
-          <div className="size-grid">
+          <div className="font-size-controls-compact">
             {fontSizes.map((size) => (
               <button
                 key={size.value}
-                className={`size-option ${activeStyles.fontSize === size.value ? 'active' : ''}`}
+                className={`font-size-btn-compact ${activeStyles.fontSize === size.value ? 'active' : ''}`}
                 onClick={() => handleFontSizeSelect(size.value)}
               >
                 {size.label}
@@ -139,13 +170,13 @@ export default function EditPanel({ isOpen, onStyleChange, selectedElement }) {
         </div>
 
         {/* Color de texto */}
-        <div className="control-group">
+        <div className="edit-panel-section">
           <h3>Color</h3>
-          <div className="color-grid">
+          <div className="color-palette-compact">
             {colors.map((color) => (
               <div
                 key={color}
-                className={`color-option ${activeStyles.color === color ? 'active' : ''}`}
+                className={`color-option-compact ${activeStyles.color === color ? 'active' : ''}`}
                 style={{ backgroundColor: color }}
                 onClick={() => handleColorSelect(color)}
                 title={color}
@@ -155,13 +186,13 @@ export default function EditPanel({ isOpen, onStyleChange, selectedElement }) {
         </div>
 
         {/* Alineación */}
-        <div className="control-group">
+        <div className="edit-panel-section">
           <h3>Alineación</h3>
-          <div className="align-grid">
+          <div className="text-align-controls-compact">
             {alignments.map((align) => (
               <button
                 key={align.value}
-                className={`align-option ${activeStyles.align === align.value ? 'active' : ''}`}
+                className={`text-align-btn-compact ${activeStyles.align === align.value ? 'active' : ''}`}
                 onClick={() => handleAlignSelect(align.value)}
                 title={align.label}
               >
@@ -172,14 +203,14 @@ export default function EditPanel({ isOpen, onStyleChange, selectedElement }) {
         </div>
 
         {/* Vista previa */}
-        <div className="control-group">
+        <div className="edit-panel-section">
           <h3>Vista Previa</h3>
-          <div className="preview-box">
+          <div className="preview-compact">
             <p 
-              className={`preview-text ${applyStylesToText()}`}
+              className={applyStylesToText()}
               style={{ color: activeStyles.color }}
             >
-              Texto de ejemplo
+              Texto ejemplo
             </p>
           </div>
         </div>
@@ -187,16 +218,16 @@ export default function EditPanel({ isOpen, onStyleChange, selectedElement }) {
         {/* Acciones */}
         <div className="action-buttons">
           <button 
-            className="action-btn reset"
-            onClick={() => handleStyleToggle('bold', false)}
+            className="action-btn action-btn-secondary"
+            onClick={resetStyles}
           >
-            Resetear Estilos
+            ↺ Resetear Estilos
           </button>
           <button 
-            className="action-btn apply"
-            onClick={() => console.log('Estilos aplicados:', activeStyles)}
+            className="action-btn action-btn-primary"
+            onClick={() => console.log('Aplicar estilos')}
           >
-            Aplicar Cambios
+            💾 Aplicar Cambios
           </button>
         </div>
       </div>
