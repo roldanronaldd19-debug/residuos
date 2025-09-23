@@ -8,10 +8,11 @@ export default function EditableText({
   onSave, 
   className = "",
   placeholder = "Escribe aquí...",
-  isSelected = false,
-  onSelect,
   elementId,
-  currentStyles = {}
+  isSelected,
+  onSelect,
+  currentStyles,
+  onStylesChange
 }) {
   const [value, setValue] = useState(text);
   const [isEditingLocal, setIsEditingLocal] = useState(false);
@@ -81,7 +82,7 @@ export default function EditableText({
     const finalValue = value.trim() === "" ? originalValue : value;
     
     if (onSave && finalValue !== originalValue) {
-      onSave(finalValue);
+      onSave(finalValue, elementId);
       setOriginalValue(finalValue);
     } else if (finalValue !== value) {
       setValue(finalValue);
@@ -106,6 +107,7 @@ export default function EditableText({
     switch (currentStyles.fontSize) {
       case 'small': styleClasses += 'text-sm '; break;
       case 'large': styleClasses += 'text-lg '; break;
+      case 'xlarge': styleClasses += 'text-xl '; break;
       default: styleClasses += 'text-base ';
     }
 
@@ -122,7 +124,7 @@ export default function EditableText({
 
   if (isEditing && isEditingLocal) {
     return (
-      <div className={`relative editable-element editing ${isSelected ? 'element-selected' : ''}`}>
+      <div className={`editable-element editing ${isSelected ? 'selected' : ''}`}>
         <textarea
           ref={inputRef}
           value={value}
@@ -137,9 +139,8 @@ export default function EditableText({
             height: 'auto',
             color: currentStyles?.color || 'inherit'
           }}
-          onClick={(e) => e.stopPropagation()}
         />
-        {isSelected && <div className="selection-indicator"></div>}
+        {isSelected && <div className="selected-indicator">✓</div>}
       </div>
     );
   }
@@ -149,23 +150,26 @@ export default function EditableText({
       <Tag
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        className={`${className} ${applyStyles()} editable-element ${isSelected ? 'element-selected selected' : ''} break-words whitespace-normal overflow-hidden text-contain rounded-lg p-3 min-h-[44px] flex items-center smooth-transition ${
-          value === placeholder ? 'text-gray-400 italic' : ''
-        }`}
+        className={`${className} ${applyStyles()} editable-element edit-ready break-words whitespace-normal overflow-hidden text-contain rounded-lg p-3 min-h-[44px] flex items-center smooth-transition ${
+          isSelected ? 'selected' : ''
+        } ${value === placeholder ? 'text-gray-400 italic' : ''}`}
         style={{
           color: currentStyles?.color || 'inherit'
         }}
       >
         {value || placeholder}
-        {isSelected && <div className="selection-indicator"></div>}
+        {isSelected && <div className="selected-indicator">✎</div>}
       </Tag>
     );
   }
 
   return (
-    <Tag className={`${className} break-words whitespace-normal overflow-hidden text-contain ${
+    <Tag className={`${className} ${applyStyles()} break-words whitespace-normal overflow-hidden text-contain ${
       value === placeholder ? 'text-gray-400 italic' : ''
-    }`}>
+    }`}
+    style={{
+      color: currentStyles?.color || 'inherit'
+    }}>
       {value || text}
     </Tag>
   );
