@@ -8,11 +8,10 @@ export default function EditableText({
   onSave, 
   className = "",
   placeholder = "Escribe aquí...",
-  elementId,
-  isSelected,
   onSelect,
-  currentStyles,
-  onStylesChange
+  isSelected = false,
+  elementId,
+  currentStyles
 }) {
   const [value, setValue] = useState(text);
   const [isEditingLocal, setIsEditingLocal] = useState(false);
@@ -39,27 +38,37 @@ export default function EditableText({
     }
   };
 
+  const handleClick = (e) => {
+    if (isEditing && !isEditingLocal) {
+      e.stopPropagation();
+      if (onSelect) {
+        onSelect({
+          type: 'text',
+          id: elementId,
+          text: value,
+          element: tag
+        });
+      }
+      setIsEditingLocal(true);
+    }
+  };
+
+  const handleContainerClick = (e) => {
+    if (isEditing && !isEditingLocal) {
+      e.stopPropagation();
+      if (onSelect) {
+        onSelect({
+          type: 'text',
+          id: elementId,
+          text: value,
+          element: tag
+        });
+      }
+    }
+  };
+
   const handleBlur = () => {
     handleSave();
-  };
-
-  const handleClick = (e) => {
-    e.stopPropagation();
-    if (isEditing && !isEditingLocal) {
-      if (onSelect) {
-        onSelect(elementId);
-      }
-    }
-  };
-
-  const handleDoubleClick = (e) => {
-    e.stopPropagation();
-    if (isEditing && !isEditingLocal) {
-      setIsEditingLocal(true);
-      if (onSelect) {
-        onSelect(elementId);
-      }
-    }
   };
 
   const handleKeyDown = (e) => {
@@ -82,7 +91,7 @@ export default function EditableText({
     const finalValue = value.trim() === "" ? originalValue : value;
     
     if (onSave && finalValue !== originalValue) {
-      onSave(finalValue, elementId);
+      onSave(finalValue);
       setOriginalValue(finalValue);
     } else if (finalValue !== value) {
       setValue(finalValue);
@@ -124,7 +133,10 @@ export default function EditableText({
 
   if (isEditing && isEditingLocal) {
     return (
-      <div className={`editable-element editing ${isSelected ? 'selected' : ''}`}>
+      <div 
+        className={`relative selectable-element editing ${isSelected ? 'selected' : ''}`}
+        onClick={handleContainerClick}
+      >
         <textarea
           ref={inputRef}
           value={value}
@@ -139,8 +151,24 @@ export default function EditableText({
             height: 'auto',
             color: currentStyles?.color || 'inherit'
           }}
+          onClick={(e) => e.stopPropagation()}
         />
-        {isSelected && <div className="selected-indicator">✓</div>}
+        <div className="edit-actions">
+          <button 
+            onClick={handleSave}
+            className="edit-btn edit-btn-save"
+            title="Guardar (Enter)"
+          >
+            ✓
+          </button>
+          <button 
+            onClick={handleCancel}
+            className="edit-btn edit-btn-cancel"
+            title="Cancelar (Esc)"
+          >
+            ✕
+          </button>
+        </div>
       </div>
     );
   }
@@ -149,27 +177,22 @@ export default function EditableText({
     return (
       <Tag
         onClick={handleClick}
-        onDoubleClick={handleDoubleClick}
-        className={`${className} ${applyStyles()} editable-element edit-ready break-words whitespace-normal overflow-hidden text-contain rounded-lg p-3 min-h-[44px] flex items-center smooth-transition ${
-          isSelected ? 'selected' : ''
-        } ${value === placeholder ? 'text-gray-400 italic' : ''}`}
+        className={`${className} ${applyStyles()} selectable-element ${isSelected ? 'selected' : 'highlighted'} break-words whitespace-normal overflow-hidden text-contain rounded-lg p-3 min-h-[44px] flex items-center transition-all duration-200 ${
+          value === placeholder ? 'text-gray-400 italic' : ''
+        }`}
         style={{
           color: currentStyles?.color || 'inherit'
         }}
       >
         {value || placeholder}
-        {isSelected && <div className="selected-indicator">✎</div>}
       </Tag>
     );
   }
 
   return (
-    <Tag className={`${className} ${applyStyles()} break-words whitespace-normal overflow-hidden text-contain ${
+    <Tag className={`${className} break-words whitespace-normal overflow-hidden text-contain ${
       value === placeholder ? 'text-gray-400 italic' : ''
-    }`}
-    style={{
-      color: currentStyles?.color || 'inherit'
-    }}>
+    }`}>
       {value || text}
     </Tag>
   );
