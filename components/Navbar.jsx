@@ -42,7 +42,7 @@ export default function Navbar({ onToggleEdit }) {
 
   if (!mounted) {
     return (
-      <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
+      <nav className="navbar bg-gray-800 text-white p-4 flex justify-between items-center">
         <div className="text-xl font-bold">Sistema de Residuos</div>
         <div className="bg-gray-600 px-4 py-2 rounded animate-pulse">Cargando...</div>
       </nav>
@@ -51,7 +51,7 @@ export default function Navbar({ onToggleEdit }) {
 
   return (
     <>
-      <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
+      <nav className="navbar bg-gray-800 text-white p-4 flex justify-between items-center">
         <div className="text-xl font-bold">Sistema de Residuos</div>
         
         <ul className="flex space-x-4">
@@ -82,7 +82,7 @@ export default function Navbar({ onToggleEdit }) {
                     : 'bg-green-500 hover:bg-green-600'
                 }`}
               >
-                {isEditing ? 'Salir de Edición' : 'Modo Edición'}
+                {isEditing ? '✕ Salir de Edición' : '✎ Modo Edición'}
               </button>
               <button 
                 onClick={handleLogout} 
