@@ -9,9 +9,9 @@ function SimpleEditableText({
   className = "",
   multiline = false,
   placeholder = "Escribe aquí...",
-  elementId,
-  isSelected,
   onSelect,
+  isSelected = false,
+  elementId,
   currentStyles
 }) {
   const [value, setValue] = useState(text);
@@ -19,27 +19,35 @@ function SimpleEditableText({
   const [originalValue, setOriginalValue] = useState(text);
   const inputRef = useRef(null);
 
+  const handleClick = (e) => {
+    if (isEditing && !isEditingLocal) {
+      e.stopPropagation();
+      if (onSelect) {
+        onSelect({
+          type: multiline ? 'description' : 'title',
+          id: elementId,
+          text: value
+        });
+      }
+      setIsEditingLocal(true);
+    }
+  };
+
+  const handleContainerClick = (e) => {
+    if (isEditing && !isEditingLocal) {
+      e.stopPropagation();
+      if (onSelect) {
+        onSelect({
+          type: multiline ? 'description' : 'title',
+          id: elementId,
+          text: value
+        });
+      }
+    }
+  };
+
   const handleBlur = () => {
     handleSave();
-  };
-
-  const handleClick = (e) => {
-    e.stopPropagation();
-    if (isEditing && !isEditingLocal) {
-      if (onSelect) {
-        onSelect(elementId);
-      }
-    }
-  };
-
-  const handleDoubleClick = (e) => {
-    e.stopPropagation();
-    if (isEditing && !isEditingLocal) {
-      setIsEditingLocal(true);
-      if (onSelect) {
-        onSelect(elementId);
-      }
-    }
   };
 
   const handleKeyDown = (e) => {
@@ -65,7 +73,7 @@ function SimpleEditableText({
     const finalValue = value.trim() === "" ? originalValue : value;
     
     if (onSave && finalValue !== originalValue) {
-      onSave(finalValue, elementId);
+      onSave(finalValue);
       setOriginalValue(finalValue);
     }
   };
@@ -104,7 +112,10 @@ function SimpleEditableText({
   if (isEditing && isEditingLocal) {
     if (multiline) {
       return (
-        <div className={`editable-element editing ${isSelected ? 'selected' : ''}`}>
+        <div 
+          className={`relative selectable-element editing ${isSelected ? 'selected' : ''}`}
+          onClick={handleContainerClick}
+        >
           <textarea
             ref={inputRef}
             value={value}
@@ -119,13 +130,20 @@ function SimpleEditableText({
               height: 'auto',
               color: currentStyles?.color || 'inherit'
             }}
+            onClick={(e) => e.stopPropagation()}
           />
-          {isSelected && <div className="selected-indicator">✓</div>}
+          <div className="edit-actions">
+            <button onClick={handleSave} className="edit-btn edit-btn-save" title="Guardar">✓</button>
+            <button onClick={handleCancel} className="edit-btn edit-btn-cancel" title="Cancelar">✕</button>
+          </div>
         </div>
       );
     } else {
       return (
-        <div className={`editable-element editing ${isSelected ? 'selected' : ''}`}>
+        <div 
+          className={`relative selectable-element editing ${isSelected ? 'selected' : ''}`}
+          onClick={handleContainerClick}
+        >
           <input
             type="text"
             value={value}
@@ -137,8 +155,12 @@ function SimpleEditableText({
             style={{
               color: currentStyles?.color || 'inherit'
             }}
+            onClick={(e) => e.stopPropagation()}
           />
-          {isSelected && <div className="selected-indicator">✓</div>}
+          <div className="edit-actions">
+            <button onClick={handleSave} className="edit-btn edit-btn-save" title="Guardar">✓</button>
+            <button onClick={handleCancel} className="edit-btn edit-btn-cancel" title="Cancelar">✕</button>
+          </div>
         </div>
       );
     }
@@ -148,27 +170,22 @@ function SimpleEditableText({
     return (
       <div
         onClick={handleClick}
-        onDoubleClick={handleDoubleClick}
-        className={`${className} ${applyStyles()} editable-element edit-ready break-words whitespace-normal overflow-hidden text-contain rounded-lg p-2 min-h-[44px] flex items-center smooth-transition ${
-          isSelected ? 'selected' : ''
-        } ${value === placeholder ? 'text-gray-400 italic' : ''}`}
+        className={`${className} ${applyStyles()} selectable-element ${isSelected ? 'selected' : 'highlighted'} break-words whitespace-normal overflow-hidden text-contain rounded-lg p-2 min-h-[44px] flex items-center transition-all duration-200 ${
+          value === placeholder ? 'text-gray-400 italic' : ''
+        }`}
         style={{
           color: currentStyles?.color || 'inherit'
         }}
       >
         {value || placeholder}
-        {isSelected && <div className="selected-indicator">✎</div>}
       </div>
     );
   }
 
   return (
-    <div className={`${className} ${applyStyles()} break-words whitespace-normal overflow-hidden text-contain ${
+    <div className={`${className} break-words whitespace-normal overflow-hidden text-contain ${
       value === placeholder ? 'text-gray-400 italic' : ''
-    }`}
-    style={{
-      color: currentStyles?.color || 'inherit'
-    }}>
+    }`}>
       {value || text}
     </div>
   );
@@ -182,41 +199,57 @@ export default function EditableCard({
   borderColor = "border-gray-200",
   isEditing, 
   onSave,
-  cardId,
-  isSelected,
   onSelect,
+  isSelected = false,
+  cardId,
   currentStyles
 }) {
-  const handleTitleSave = (newTitle, elementId) => {
-    if (onSave) onSave({ type: 'title', value: newTitle, elementId, cardId });
+  const [selectedElement, setSelectedElement] = useState(null);
+
+  const handleTitleSave = (newTitle) => {
+    if (onSave) onSave({ type: 'title', value: newTitle });
   };
 
-  const handleDescriptionSave = (newDescription, elementId) => {
-    if (onSave) onSave({ type: 'description', value: newDescription, elementId, cardId });
+  const handleDescriptionSave = (newDescription) => {
+    if (onSave) onSave({ type: 'description', value: newDescription });
+  };
+
+  const handleElementSelect = (element) => {
+    setSelectedElement(element);
+    if (onSelect) {
+      onSelect({
+        ...element,
+        cardId: cardId
+      });
+    }
   };
 
   const handleCardClick = (e) => {
-    e.stopPropagation();
-    if (isEditing && onSelect) {
-      onSelect(cardId);
+    if (isEditing) {
+      e.stopPropagation();
+      if (onSelect) {
+        onSelect({
+          type: 'card',
+          id: cardId,
+          text: title
+        });
+      }
     }
   };
 
   const CardContent = () => (
     <div 
+      className={`p-4 rounded-lg border-2 ${borderColor} ${bgColor} shadow-sm hover:shadow-md transition-all duration-300 min-h-[160px] flex flex-col overflow-hidden w-full selectable-element ${isSelected ? 'selected' : 'highlighted'}`}
       onClick={handleCardClick}
-      className={`p-4 rounded-lg border-2 ${borderColor} ${bgColor} shadow-sm hover:shadow-md transition-all duration-300 min-h-[160px] flex flex-col overflow-hidden w-full smooth-transition ${
-        isSelected ? 'selected editable-element edit-ready' : ''
-      }`}
     >
       <div className="mb-3 min-h-[52px] flex items-start overflow-hidden">
         <SimpleEditableText
           text={title}
           isEditing={isEditing}
           onSave={handleTitleSave}
+          onSelect={handleElementSelect}
+          isSelected={selectedElement?.type === 'title'}
           elementId={`${cardId}-title`}
-          isSelected={isSelected}
-          onSelect={onSelect}
           currentStyles={currentStyles}
           className="text-lg font-semibold text-gray-800 w-full line-clamp-2"
           multiline={false}
@@ -229,9 +262,9 @@ export default function EditableCard({
           text={description}
           isEditing={isEditing}
           onSave={handleDescriptionSave}
+          onSelect={handleElementSelect}
+          isSelected={selectedElement?.type === 'description'}
           elementId={`${cardId}-description`}
-          isSelected={isSelected}
-          onSelect={onSelect}
           currentStyles={currentStyles}
           className="text-sm text-gray-600 w-full line-clamp-3"
           multiline={true}
@@ -246,7 +279,6 @@ export default function EditableCard({
           </span>
         </div>
       )}
-      {isSelected && <div className="selected-indicator">✦</div>}
     </div>
   );
 
@@ -255,7 +287,7 @@ export default function EditableCard({
   }
 
   return (
-    <Link href={link} className="block w-full smooth-transition">
+    <Link href={link} className="block w-full">
       <CardContent />
     </Link>
   );
