@@ -50,89 +50,71 @@ body {
   word-break: break-word;
 }
 
-/* Modo edición activo - más sutil */
-.edit-mode-active .editable-element {
+/* Mejores estilos para modo edición */
+.edit-mode-active {
   position: relative;
 }
 
-.edit-mode-active .editable-element::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border: 2px solid transparent;
-  border-radius: 6px;
-  pointer-events: none;
-}
-
-/* Elemento seleccionado para edición */
-.editable-element.selected {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
-  border: 2px solid #3b82f6 !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
-  z-index: 10;
-}
-
-.editable-element.selected::after {
-  content: "✎ Seleccionado";
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #3b82f6;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 9px;
-  font-weight: bold;
-  z-index: 11;
-}
-
-/* Efectos hover en modo edición */
-.edit-mode-active .editable-element:hover {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  border-color: #60a5fa;
-  cursor: pointer;
-  transform: translateY(-1px);
+.edit-hover:hover {
+  transform: translateY(-2px);
   transition: all 0.2s ease;
 }
 
-/* Panel lateral compacto */
+/* Efectos de transición suave */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mejoras visuales para cards en modo edición */
+.card-editable {
+  transition: all 0.3s ease;
+}
+
+.card-editable.edit-mode:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Elemento seleccionado para edición individual */
+.element-selected {
+  position: relative;
+  z-index: 100;
+  box-shadow: 0 0 0 3px #3b82f6, 0 8px 25px rgba(59, 130, 246, 0.3);
+  transform: scale(1.02);
+  border-radius: 8px;
+}
+
+.element-selected::before {
+  content: "Seleccionado";
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: #3b82f6;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 101;
+}
+
+/* Panel lateral de edición compacto */
 .edit-panel {
   position: fixed;
-  top: 0;
+  top: 50%;
   right: -320px;
   width: 300px;
-  height: 100vh;
+  transform: translateY(-50%);
   background: white;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px 0 0 12px;
   z-index: 2000;
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-y: auto;
-  border-left: 1px solid #e5e7eb;
+  overflow: hidden;
 }
 
 .edit-panel.open {
   right: 0;
-}
-
-.edit-panel-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 1999;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-}
-
-.edit-panel-overlay.open {
-  opacity: 1;
-  visibility: visible;
 }
 
 .edit-panel-header {
@@ -142,25 +124,25 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #374151;
+}
+
+.edit-panel-header h2 {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .edit-panel-content {
   padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .edit-panel-section {
   margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.edit-panel-section:last-child {
-  border-bottom: none;
 }
 
 .edit-panel-section h3 {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #374151;
   margin-bottom: 10px;
@@ -169,93 +151,93 @@ body {
 }
 
 /* Controles compactos */
-.style-controls {
+.compact-controls {
   display: grid;
   gap: 8px;
 }
 
-.style-button {
+.compact-button {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 8px 10px;
   border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  border-radius: 6px;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 13px;
+  font-size: 12px;
 }
 
-.style-button:hover {
+.compact-button:hover {
   border-color: #3b82f6;
   background: #f8fafc;
 }
 
-.style-button.active {
+.compact-button.active {
   border-color: #3b82f6;
   background: #eff6ff;
   color: #1d4ed8;
 }
 
-.color-palette {
+.color-palette-compact {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 6px;
 }
 
-.color-option {
-  width: 28px;
-  height: 28px;
+.color-option-compact {
+  width: 24px;
+  height: 24px;
   border-radius: 4px;
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.2s ease;
 }
 
-.color-option:hover {
+.color-option-compact:hover {
   transform: scale(1.1);
 }
 
-.color-option.active {
+.color-option-compact.active {
   border-color: #1f2937;
   transform: scale(1.1);
 }
 
-.font-size-controls {
+.font-size-compact {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;
 }
 
-.font-size-btn {
+.font-size-btn-compact {
   padding: 6px 8px;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 12px;
+  font-size: 11px;
   text-align: center;
 }
 
-.font-size-btn:hover {
+.font-size-btn-compact:hover {
   border-color: #3b82f6;
 }
 
-.font-size-btn.active {
+.font-size-btn-compact.active {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
 }
 
-.text-align-controls {
+.text-align-compact {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
 
-.text-align-btn {
+.text-align-btn-compact {
   padding: 8px;
   border: 1px solid #e5e7eb;
   border-radius: 4px;
@@ -265,90 +247,120 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  font-size: 14px;
+  font-size: 12px;
 }
 
-.text-align-btn:hover {
+.text-align-btn-compact:hover {
   border-color: #3b82f6;
 }
 
-.text-align-btn.active {
+.text-align-btn-compact.active {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
 }
 
-/* Botones de acción */
-.panel-actions {
+/* Botón toggle del panel */
+.edit-panel-toggle {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border-radius: 8px 0 0 8px;
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.panel-btn {
-  flex: 1;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
   cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s ease;
+  box-shadow: -4px 0 12px rgba(59, 130, 246, 0.3);
+  z-index: 1999;
+  transition: all 0.3s ease;
 }
 
-.panel-btn-secondary {
-  background: #6b7280;
-  color: white;
+.edit-panel-toggle:hover {
+  width: 45px;
 }
 
-.panel-btn-secondary:hover {
-  background: #4b5563;
+/* Elemento editable con sombreado al seleccionar */
+.editable-element {
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
 }
 
-.panel-btn-primary {
-  background: #10b981;
-  color: white;
+.editable-element:hover {
+  background: #f8fafc;
 }
 
-.panel-btn-primary:hover {
-  background: #059669;
-}
-
-/* Contenido principal con panel abierto */
-.main-content-with-panel {
-  margin-right: 0;
-  transition: margin-right 0.3s ease;
-}
-
-.main-content-with-panel.panel-open {
-  margin-right: 300px;
-}
-
-/* Efectos de transición suave */
-.smooth-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.editable-element.selected {
+  background: #eff6ff !important;
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-radius: 4px;
 }
 
 /* Indicador de elemento seleccionado */
 .selection-indicator {
   position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
-  border: 2px solid #3b82f6;
-  border-radius: 8px;
-  pointer-events: none;
-  z-index: 5;
-  animation: pulse-selection 2s infinite;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 2px solid white;
+  z-index: 10;
 }
 
-@keyframes pulse-selection {
-  0%, 100% {
-    opacity: 0.7;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
+/* Vista previa compacta */
+.preview-compact {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  font-size: 11px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Botones de acción compactos */
+.actions-compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.action-btn-compact {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn-compact.reset {
+  background: #6b7280;
+  color: white;
+}
+
+.action-btn-compact.reset:hover {
+  background: #4b5563;
+}
+
+.action-btn-compact.apply {
+  background: #10b981;
+  color: white;
+}
+
+.action-btn-compact.apply:hover {
+  background: #059669;
 }
