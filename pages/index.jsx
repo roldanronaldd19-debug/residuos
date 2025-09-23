@@ -115,4 +115,56 @@ export default function Home() {
               tag="h1"
               isEditing={isEditing}
               onSave={handleSave}
-              onSelect={handleElement
+              onSelect={handleElementSelect}
+              isSelected={selectedElement?.id === 'main-title'}
+              elementId="main-title"
+              currentStyles={currentStyles}
+              className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 break-words"
+              placeholder="Título principal del sistema..."
+            />
+            <EditableText
+              text="Monitorea indicadores, gestiona metas y genera reportes de sostenibilidad para una gestión eficiente."
+              tag="p"
+              isEditing={isEditing}
+              onSave={handleSave}
+              onSelect={handleElementSelect}
+              isSelected={selectedElement?.id === 'main-description'}
+              elementId="main-description"
+              currentStyles={currentStyles}
+              className="text-base sm:text-lg text-gray-600 break-words"
+              placeholder="Descripción del sistema..."
+            />
+          </div>
+
+          {/* Grid de tarjetas */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {cardData.map((card) => (
+              <div key={card.id} className="w-full transition-all duration-200">
+                <EditableCard
+                  title={card.title}
+                  description={card.description}
+                  link={card.link}
+                  bgColor={card.bgColor}
+                  borderColor={card.borderColor}
+                  isEditing={isEditing}
+                  onSave={handleSave}
+                  onSelect={handleElementSelect}
+                  isSelected={selectedElement?.cardId === card.id}
+                  cardId={card.id}
+                  currentStyles={currentStyles}
+                />
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+
+      {/* Indicador de modo edición */}
+      {isEditing && (
+        <div className={`edit-mode-indicator ${isEditing ? 'with-panel' : 'without-panel'}`}>
+          ✎ Modo Edición Activo
+        </div>
+      )}
+    </div>
+  );
+}
