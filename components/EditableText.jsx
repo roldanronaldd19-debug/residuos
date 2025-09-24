@@ -11,7 +11,7 @@ export default function EditableText({
   onSelect,
   isSelected = false,
   elementId,
-  currentStyles
+  elementStyles = {} // Estilos individuales para este elemento
 }) {
   const [value, setValue] = useState(text);
   const [isEditingLocal, setIsEditingLocal] = useState(false);
@@ -46,7 +46,8 @@ export default function EditableText({
           type: 'text',
           id: elementId,
           text: value,
-          element: tag
+          element: tag,
+          styles: elementStyles // Pasar los estilos actuales al panel
         });
       }
       setIsEditingLocal(true);
@@ -61,7 +62,8 @@ export default function EditableText({
           type: 'text',
           id: elementId,
           text: value,
-          element: tag
+          element: tag,
+          styles: elementStyles
         });
       }
     }
@@ -103,24 +105,24 @@ export default function EditableText({
     setValue(originalValue);
   };
 
-  // Aplicar estilos desde el panel
+  // Aplicar estilos individuales desde el panel
   const applyStyles = () => {
-    if (!currentStyles) return '';
+    if (!elementStyles) return '';
     
     let styleClasses = '';
     
-    if (currentStyles.bold) styleClasses += 'font-bold ';
-    if (currentStyles.italic) styleClasses += 'italic ';
-    if (currentStyles.underline) styleClasses += 'underline ';
+    if (elementStyles.bold) styleClasses += 'font-bold ';
+    if (elementStyles.italic) styleClasses += 'italic ';
+    if (elementStyles.underline) styleClasses += 'underline ';
     
-    switch (currentStyles.fontSize) {
+    switch (elementStyles.fontSize) {
       case 'small': styleClasses += 'text-sm '; break;
       case 'large': styleClasses += 'text-lg '; break;
       case 'xlarge': styleClasses += 'text-xl '; break;
       default: styleClasses += 'text-base ';
     }
 
-    switch (currentStyles.align) {
+    switch (elementStyles.align) {
       case 'center': styleClasses += 'text-center '; break;
       case 'right': styleClasses += 'text-right '; break;
       default: styleClasses += 'text-left ';
@@ -149,7 +151,7 @@ export default function EditableText({
             minHeight: '44px',
             maxHeight: '200px',
             height: 'auto',
-            color: currentStyles?.color || 'inherit'
+            color: elementStyles?.color || 'inherit'
           }}
           onClick={(e) => e.stopPropagation()}
         />
@@ -181,7 +183,7 @@ export default function EditableText({
           value === placeholder ? 'text-gray-400 italic' : ''
         }`}
         style={{
-          color: currentStyles?.color || 'inherit'
+          color: elementStyles?.color || 'inherit'
         }}
       >
         {value || placeholder}
