@@ -315,4 +315,39 @@ export default function EditableCard({
       </div>
       
       <div className="flex-grow min-h-[68px] overflow-hidden">
-        <SimpleEd
+        <SimpleEditableText
+          text={description}
+          isEditing={isEditing}
+          onSave={handleDescriptionSave}
+          onSelect={handleElementSelect}
+          isSelected={isSelected}
+          isEditingThisElement={isEditingThisElement}
+          elementId={`${cardId}-description`}
+          styles={descriptionStyles}
+          onStartEdit={onStartEdit}
+          className="text-sm text-gray-600 w-full line-clamp-3"
+          multiline={true}
+          placeholder="Descripción de la tarjeta..."
+        />
+      </div>
+      
+      {!isEditing && link && (
+        <div className="mt-3 pt-2 border-t border-gray-200">
+          <span className="text-blue-600 text-sm font-medium hover:text-blue-800 transition-colors">
+            Ver más →
+          </span>
+        </div>
+      )}
+    </div>
+  );
+
+  if (isEditing || !link) {
+    return <CardContent />;
+  }
+
+  return (
+    <Link href={link} className="block w-full">
+      <CardContent />
+    </Link>
+  );
+}
