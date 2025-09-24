@@ -29,11 +29,12 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
     { label: 'Der', value: 'right', icon: '⫹' }
   ];
 
-  // Cargar estilos del elemento seleccionado
+  // Cuando cambia el elemento seleccionado, cargar sus estilos
   useEffect(() => {
     if (selectedElement && selectedElement.styles) {
       setActiveStyles(selectedElement.styles);
     } else {
+      // Reset a estilos por defecto si no hay elemento seleccionado
       setActiveStyles({
         bold: false,
         italic: false,
@@ -111,6 +112,7 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
       align: 'left'
     };
     setActiveStyles(defaultStyles);
+    
     if (selectedElement) {
       onStyleChange(selectedElement.id, defaultStyles);
     }
@@ -127,7 +129,9 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
       <div className="edit-panel-header">
         <div>
           <h2 className="text-sm font-semibold">Editor</h2>
-          <p className="text-xs opacity-90">Edita elementos individualmente</p>
+          <p className="text-xs opacity-90">
+            {selectedElement ? `Editando: ${selectedElement.type}` : 'Selecciona un elemento'}
+          </p>
         </div>
         <button 
           onClick={onClose}
@@ -160,7 +164,7 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
           <>
             {/* Estilos de texto */}
             <div className="edit-panel-section">
-              <h3>Estilos de Texto</h3>
+              <h3>Estilos</h3>
               <div className="compact-controls">
                 <div className="flex gap-2">
                   <button
@@ -168,21 +172,18 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
                     onClick={() => handleStyleToggle('bold', !activeStyles.bold)}
                   >
                     <span className="font-bold">B</span>
-                    <span>Negrita</span>
                   </button>
                   <button
                     className={`compact-button flex-1 ${activeStyles.italic ? 'active' : ''}`}
                     onClick={() => handleStyleToggle('italic', !activeStyles.italic)}
                   >
                     <span className="italic">I</span>
-                    <span>Cursiva</span>
                   </button>
                   <button
                     className={`compact-button flex-1 ${activeStyles.underline ? 'active' : ''}`}
                     onClick={() => handleStyleToggle('underline', !activeStyles.underline)}
                   >
                     <span className="underline">U</span>
-                    <span>Subrayado</span>
                   </button>
                 </div>
               </div>
@@ -190,7 +191,7 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
 
             {/* Tamaño de fuente */}
             <div className="edit-panel-section">
-              <h3>Tamaño de Fuente</h3>
+              <h3>Tamaño</h3>
               <div className="font-size-controls-compact">
                 {fontSizes.map((size) => (
                   <button
@@ -206,7 +207,7 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
 
             {/* Color de texto */}
             <div className="edit-panel-section">
-              <h3>Color de Texto</h3>
+              <h3>Color</h3>
               <div className="color-palette-compact">
                 {colors.map((color) => (
                   <div
@@ -249,31 +250,27 @@ export default function EditPanel({ isOpen, onClose, onStyleChange, selectedElem
                 </p>
               </div>
             </div>
-
-            {/* Acciones */}
-            <div className="action-buttons">
-              <button 
-                className="action-btn action-btn-secondary"
-                onClick={resetStyles}
-              >
-                ↺ Resetear Estilos
-              </button>
-              <button 
-                className="action-btn action-btn-primary"
-                onClick={applyStylesToElement}
-              >
-                💾 Aplicar al Elemento
-              </button>
-            </div>
           </>
         )}
 
-        {!selectedElement && (
-          <div className="text-center py-8 text-gray-500 text-sm">
-            <div className="text-2xl mb-2">👆</div>
-            Selecciona un elemento en la página para comenzar a editar
-          </div>
-        )}
+        {/* Acciones */}
+        <div className="action-buttons">
+          {selectedElement && (
+            <button 
+              className="action-btn action-btn-secondary"
+              onClick={resetStyles}
+            >
+              ↺ Resetear Estilos
+            </button>
+          )}
+          <button 
+            className="action-btn action-btn-primary"
+            onClick={applyStylesToElement}
+            disabled={!selectedElement}
+          >
+            💾 Aplicar al Elemento
+          </button>
+        </div>
       </div>
     </div>
   );
