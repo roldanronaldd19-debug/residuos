@@ -26,30 +26,36 @@ const EditPanel = dynamic(() => import("../components/EditPanel"), {
 export default function Home() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedElement, setSelectedElement] = useState(null);
-  const [elementStyles, setElementStyles] = useState({}); // Estilos por elemento ID
+  const [editingElementId, setEditingElementId] = useState(null);
+  
+  // Estilos individuales para cada elemento
+  const [elementStyles, setElementStyles] = useState({});
 
-  const handleSave = (newValue) => {
-    console.log("Texto guardado:", newValue);
+  const handleSave = (saveData) => {
+    console.log("Texto guardado:", saveData);
   };
 
-  const handleStyleChange = (elementId, styles) => {
+  const handleElementSelect = (element) => {
+    setSelectedElement(element);
+    setEditingElementId(element.id);
+  };
+
+  const handleStartEdit = (elementId) => {
+    setEditingElementId(elementId);
+  };
+
+  const handleApplyStyles = (elementId, styles) => {
     setElementStyles(prev => ({
       ...prev,
       [elementId]: styles
     }));
   };
 
-  const handleElementSelect = (element) => {
-    setSelectedElement({
-      ...element,
-      styles: elementStyles[element.id] || {} // Cargar estilos existentes del elemento
-    });
-  };
-
   const handleToggleEdit = (editMode) => {
     setIsEditing(editMode);
     if (!editMode) {
       setSelectedElement(null);
+      setEditingElementId(null);
     }
   };
 
@@ -102,8 +108,9 @@ export default function Home() {
       <EditPanel 
         isOpen={isEditing}
         onClose={() => setIsEditing(false)}
-        onStyleChange={handleStyleChange}
+        onStyleChange={() => {}}
         selectedElement={selectedElement}
+        onApplyStyles={handleApplyStyles}
       />
 
       {/* Contenido principal */}
@@ -112,7 +119,7 @@ export default function Home() {
         
         <main className="max-w-7xl mx-auto mt-10 p-4 sm:p-6">
           {/* Header editable */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow w-full text-contain transition-all duration-200">
+          <div className="mb-8 bg-white p-6 rounded-lg shadow w-full text-contain">
             <EditableText
               text="Sistema de Gestión de Residuos Sólidos"
               tag="h1"
@@ -120,8 +127,10 @@ export default function Home() {
               onSave={handleSave}
               onSelect={handleElementSelect}
               isSelected={selectedElement?.id === 'main-title'}
+              isEditingThisElement={editingElementId === 'main-title'}
               elementId="main-title"
-              elementStyles={elementStyles['main-title'] || {}} // Estilos individuales
+              styles={elementStyles['main-title'] || {}}
+              onStartEdit={handleStartEdit}
               className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 break-words"
               placeholder="Título principal del sistema..."
             />
@@ -132,8 +141,10 @@ export default function Home() {
               onSave={handleSave}
               onSelect={handleElementSelect}
               isSelected={selectedElement?.id === 'main-description'}
+              isEditingThisElement={editingElementId === 'main-description'}
               elementId="main-description"
-              elementStyles={elementStyles['main-description'] || {}} // Estilos individuales
+              styles={elementStyles['main-description'] || {}}
+              onStartEdit={handleStartEdit}
               className="text-base sm:text-lg text-gray-600 break-words"
               placeholder="Descripción del sistema..."
             />
@@ -153,11 +164,11 @@ export default function Home() {
                   onSave={handleSave}
                   onSelect={handleElementSelect}
                   isSelected={selectedElement?.cardId === card.id}
+                  isEditingThisElement={editingElementId === card.id}
                   cardId={card.id}
-                  elementStyles={{
-                    title: elementStyles[`${card.id}-title`] || {},
-                    description: elementStyles[`${card.id}-description`] || {}
-                  }} // Estilos individuales por elemento de la card
+                  titleStyles={elementStyles[`${card.id}-title`] || {}}
+                  descriptionStyles={elementStyles[`${card.id}-description`] || {}}
+                  onStartEdit={handleStartEdit}
                 />
               </div>
             ))}
