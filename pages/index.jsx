@@ -40,7 +40,10 @@ export default function Home() {
   };
 
   const handleElementSelect = (element) => {
-    setSelectedElement(element);
+    setSelectedElement({
+      ...element,
+      styles: elementStyles[element.id] || {} // Cargar estilos existentes del elemento
+    });
   };
 
   const handleToggleEdit = (editMode) => {
@@ -109,10 +112,7 @@ export default function Home() {
         
         <main className="max-w-7xl mx-auto mt-10 p-4 sm:p-6">
           {/* Header editable */}
-          <div 
-            className="mb-8 bg-white p-6 rounded-lg shadow w-full text-contain transition-all duration-200"
-            onClick={() => isEditing && handleElementSelect({ type: 'header', id: 'main-header' })}
-          >
+          <div className="mb-8 bg-white p-6 rounded-lg shadow w-full text-contain transition-all duration-200">
             <EditableText
               text="Sistema de Gestión de Residuos Sólidos"
               tag="h1"
