@@ -220,20 +220,29 @@ body {
   border-color: #3b82f6;
 }
 
-/* Elementos seleccionables */
-.selectable-element {
-  transition: all 0.3s ease;
+/* Estados de elementos editables */
+.editable-container {
   position: relative;
+  transition: all 0.3s ease;
 }
 
-.selectable-element.selected {
+.editable-container.editing-mode {
+  cursor: pointer;
+}
+
+.editable-container.editable-hover:hover {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-color: #3b82f6;
+}
+
+.editable-container.selected {
   background: linear-gradient(135deg, #dbeafe, #eff6ff) !important;
   border: 2px solid #3b82f6 !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
   z-index: 10;
 }
 
-.selectable-element.selected::before {
+.editable-container.selected::before {
   content: "✓ Seleccionado";
   position: absolute;
   top: -8px;
@@ -247,23 +256,72 @@ body {
   z-index: 11;
 }
 
-.selectable-element.highlighted {
-  background: linear-gradient(135deg, #fef3c7, #fef7cd) !important;
-  border: 1px dashed #f59e0b !important;
+.editable-container.editing {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+  border: 2px dashed #3b82f6 !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+  z-index: 20;
 }
 
-/* Estados de edición */
-.editing-mode .selectable-element {
+.editable-container.editing::before {
+  content: "✎ Editando";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #3b82f6;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: bold;
+  z-index: 21;
+}
+
+/* Botones de acción para edición */
+.edit-actions {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  display: flex;
+  gap: 4px;
+  z-index: 30;
+}
+
+.edit-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.editing-mode .selectable-element:hover {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-  border-color: #3b82f6;
-  transform: translateY(-1px);
+.edit-btn-save {
+  background: #10b981;
+  color: white;
 }
 
-/* Botones de acción */
+.edit-btn-save:hover {
+  background: #059669;
+  transform: scale(1.1);
+}
+
+.edit-btn-cancel {
+  background: #ef4444;
+  color: white;
+}
+
+.edit-btn-cancel:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* Botones de acción del panel */
 .action-buttons {
   display: grid;
   gap: 8px;
@@ -332,4 +390,42 @@ body {
 
 .edit-mode-indicator.without-panel {
   left: 20px;
+}
+
+/* Estilos para textareas e inputs de edición */
+.edit-textarea {
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.edit-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+}
+
+/* Efecto de sombreado profesional para texto seleccionado */
+.text-selection {
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+}
+
+.text-selection::selection {
+  background: #3b82f6;
+  color: white;
+}
+
+.text-selection::-moz-selection {
+  background: #3b82f6;
+  color: white;
 }
