@@ -12,7 +12,7 @@ function SimpleEditableText({
   onSelect,
   isSelected = false,
   elementId,
-  currentStyles
+  elementStyles = {} // Estilos individuales para este elemento
 }) {
   const [value, setValue] = useState(text);
   const [isEditingLocal, setIsEditingLocal] = useState(false);
@@ -26,7 +26,8 @@ function SimpleEditableText({
         onSelect({
           type: multiline ? 'description' : 'title',
           id: elementId,
-          text: value
+          text: value,
+          styles: elementStyles
         });
       }
       setIsEditingLocal(true);
@@ -40,7 +41,8 @@ function SimpleEditableText({
         onSelect({
           type: multiline ? 'description' : 'title',
           id: elementId,
-          text: value
+          text: value,
+          styles: elementStyles
         });
       }
     }
@@ -83,24 +85,24 @@ function SimpleEditableText({
     setValue(originalValue);
   };
 
-  // Aplicar estilos desde el panel
+  // Aplicar estilos individuales desde el panel
   const applyStyles = () => {
-    if (!currentStyles) return '';
+    if (!elementStyles) return '';
     
     let styleClasses = '';
     
-    if (currentStyles.bold) styleClasses += 'font-bold ';
-    if (currentStyles.italic) styleClasses += 'italic ';
-    if (currentStyles.underline) styleClasses += 'underline ';
+    if (elementStyles.bold) styleClasses += 'font-bold ';
+    if (elementStyles.italic) styleClasses += 'italic ';
+    if (elementStyles.underline) styleClasses += 'underline ';
     
-    switch (currentStyles.fontSize) {
+    switch (elementStyles.fontSize) {
       case 'small': styleClasses += 'text-sm '; break;
       case 'large': styleClasses += 'text-lg '; break;
       case 'xlarge': styleClasses += 'text-xl '; break;
       default: styleClasses += 'text-base ';
     }
 
-    switch (currentStyles.align) {
+    switch (elementStyles.align) {
       case 'center': styleClasses += 'text-center '; break;
       case 'right': styleClasses += 'text-right '; break;
       default: styleClasses += 'text-left ';
@@ -128,7 +130,7 @@ function SimpleEditableText({
               minHeight: '60px',
               maxHeight: '150px',
               height: 'auto',
-              color: currentStyles?.color || 'inherit'
+              color: elementStyles?.color || 'inherit'
             }}
             onClick={(e) => e.stopPropagation()}
           />
@@ -153,7 +155,7 @@ function SimpleEditableText({
             placeholder={placeholder}
             className={`${className} ${applyStyles()} w-full break-words whitespace-normal contain-text bg-transparent outline-none rounded-lg p-2`}
             style={{
-              color: currentStyles?.color || 'inherit'
+              color: elementStyles?.color || 'inherit'
             }}
             onClick={(e) => e.stopPropagation()}
           />
@@ -174,7 +176,7 @@ function SimpleEditableText({
           value === placeholder ? 'text-gray-400 italic' : ''
         }`}
         style={{
-          color: currentStyles?.color || 'inherit'
+          color: elementStyles?.color || 'inherit'
         }}
       >
         {value || placeholder}
@@ -202,7 +204,7 @@ export default function EditableCard({
   onSelect,
   isSelected = false,
   cardId,
-  currentStyles
+  elementStyles = {} // Estilos individuales para esta card
 }) {
   const [selectedElement, setSelectedElement] = useState(null);
 
@@ -250,7 +252,7 @@ export default function EditableCard({
           onSelect={handleElementSelect}
           isSelected={selectedElement?.type === 'title'}
           elementId={`${cardId}-title`}
-          currentStyles={currentStyles}
+          elementStyles={elementStyles.title || {}} // Estilos específicos para el título
           className="text-lg font-semibold text-gray-800 w-full line-clamp-2"
           multiline={false}
           placeholder="Título de la tarjeta..."
@@ -265,7 +267,7 @@ export default function EditableCard({
           onSelect={handleElementSelect}
           isSelected={selectedElement?.type === 'description'}
           elementId={`${cardId}-description`}
-          currentStyles={currentStyles}
+          elementStyles={elementStyles.description || {}} // Estilos específicos para la descripción
           className="text-sm text-gray-600 w-full line-clamp-3"
           multiline={true}
           placeholder="Descripción de la tarjeta..."
