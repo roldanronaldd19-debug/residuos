@@ -47,7 +47,7 @@ export default function EditableText({
           id: elementId,
           text: value,
           element: tag,
-          styles: elementStyles // Pasar los estilos actuales al panel
+          styles: elementStyles // Pasar los estilos actuales del elemento
         });
       }
       setIsEditingLocal(true);
@@ -105,7 +105,7 @@ export default function EditableText({
     setValue(originalValue);
   };
 
-  // Aplicar estilos individuales desde el panel
+  // Aplicar estilos individuales de este elemento
   const applyStyles = () => {
     if (!elementStyles) return '';
     
