@@ -26,14 +26,17 @@ const EditPanel = dynamic(() => import("../components/EditPanel"), {
 export default function Home() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedElement, setSelectedElement] = useState(null);
-  const [currentStyles, setCurrentStyles] = useState({});
+  const [elementStyles, setElementStyles] = useState({}); // Estilos por elemento ID
 
   const handleSave = (newValue) => {
     console.log("Texto guardado:", newValue);
   };
 
-  const handleStyleChange = (styles) => {
-    setCurrentStyles(styles);
+  const handleStyleChange = (elementId, styles) => {
+    setElementStyles(prev => ({
+      ...prev,
+      [elementId]: styles
+    }));
   };
 
   const handleElementSelect = (element) => {
@@ -118,7 +121,7 @@ export default function Home() {
               onSelect={handleElementSelect}
               isSelected={selectedElement?.id === 'main-title'}
               elementId="main-title"
-              currentStyles={currentStyles}
+              elementStyles={elementStyles['main-title'] || {}} // Estilos individuales
               className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 break-words"
               placeholder="Título principal del sistema..."
             />
@@ -130,7 +133,7 @@ export default function Home() {
               onSelect={handleElementSelect}
               isSelected={selectedElement?.id === 'main-description'}
               elementId="main-description"
-              currentStyles={currentStyles}
+              elementStyles={elementStyles['main-description'] || {}} // Estilos individuales
               className="text-base sm:text-lg text-gray-600 break-words"
               placeholder="Descripción del sistema..."
             />
@@ -151,7 +154,10 @@ export default function Home() {
                   onSelect={handleElementSelect}
                   isSelected={selectedElement?.cardId === card.id}
                   cardId={card.id}
-                  currentStyles={currentStyles}
+                  elementStyles={{
+                    title: elementStyles[`${card.id}-title`] || {},
+                    description: elementStyles[`${card.id}-description`] || {}
+                  }} // Estilos individuales por elemento de la card
                 />
               </div>
             ))}
