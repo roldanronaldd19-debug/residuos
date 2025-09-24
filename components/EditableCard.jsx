@@ -27,7 +27,7 @@ function SimpleEditableText({
           type: multiline ? 'description' : 'title',
           id: elementId,
           text: value,
-          styles: elementStyles
+          styles: elementStyles // Pasar estilos actuales
         });
       }
       setIsEditingLocal(true);
@@ -85,7 +85,7 @@ function SimpleEditableText({
     setValue(originalValue);
   };
 
-  // Aplicar estilos individuales desde el panel
+  // Aplicar estilos individuales de este elemento
   const applyStyles = () => {
     if (!elementStyles) return '';
     
